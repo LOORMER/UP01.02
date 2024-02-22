@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.TextView
+import ru.btpit.nmedia.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,29 +14,49 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        var imgbutt = findViewById<ImageButton>(R.id.imagebutn)
-        var text12 = findViewById<TextView>(R.id.text1)
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         var count = true
-        imgbutt.setOnClickListener {
-            if (count) {
-                text12.setText("1")
-                imgbutt.setBackgroundResource(R.drawable.redlikes)
-            } else {
-                text12.setText("0")
-                imgbutt.setBackgroundResource(R.drawable.likes)
+        val Post = post(
+            0,
+            "ГБПОУ ВО &quot;БТПИТ&quot;",
+            "✅ Подать заявление на участие в дистанционном электронном голосовании до 11 марта 2024 года✅ Выбрать удобный избирательный участок для голосования и подать заявление до 11 марта 2024 года✅ Узнайте о возможностях для избирателей на «Госуслугах»",
+            "20 февраля в 17:18",
+            0,
+            0,
+            false
+
+
+
+        )
+        with(binding)
+        {
+            textViewHeader.text = Post.header
+            textViewContent.text = Post.content
+            textViewDateTime.text = Post.datatime
+            textViewLike.text = Post.like.toString()
+            textViewRepost.text = Post.repost.toString()
+
+
+            imagebutn.setOnClickListener {
+                if (count) {
+                    textViewLike.setText("1")
+                    imagebutn.setBackgroundResource(R.drawable.redlikes)
+                } else {
+                    textViewLike.setText("0")
+                    imagebutn.setBackgroundResource(R.drawable.likes)
+                }
+                count = count.not()
             }
-            count = count.not()
         }
-        var text11 = findViewById<TextView>(R.id.text2)
+
+
+
+        var text11 = findViewById<TextView>(R.id.textViewRepost)
         var imagebutton2 = findViewById<ImageButton>(R.id.imagebutn2)
         imagebutton2.setOnClickListener {
-            if (count) {
-                text11.setText("1")
-            } else {
-                text11.setText("0")
-            }
-            count = count.not()
+            present_value_int +=1;
+            text11.setText(likecount(present_value_int));
         }
     }
 
