@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 interface PostRepository {
     fun get(): LiveData<Post>
     fun like()
+    fun repos()
 }
 
 class PostRepositoryInMemoryImpl : PostRepository {
@@ -16,7 +17,8 @@ class PostRepositoryInMemoryImpl : PostRepository {
         dataTime = "21 февраля в 19:12",
         isLike = false,
         amountlike = 999,
-        amountrepost = 15
+        amountrepost = 15,
+        isRepos = false
     )
     private val data = MutableLiveData(post)
 
@@ -30,9 +32,21 @@ class PostRepositoryInMemoryImpl : PostRepository {
             post.isLike = !post.isLike
         data.value = post
     }
+    override fun repos() {
+
+        if (post.isRepos)
+            post.amountrepost--
+        else
+            post.amountrepost++
+        post.isRepos = !post.isRepos
+        data.value = post
+    }
+
+
 }
 class PostViewModel : ViewModel() {
     private val repository: PostRepository = PostRepositoryInMemoryImpl()
     val data = repository.get()
     fun like() = repository.like()
+    fun repos()= repository.repos()
 }

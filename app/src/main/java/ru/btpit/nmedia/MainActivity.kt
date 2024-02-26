@@ -32,6 +32,10 @@ class MainActivity : AppCompatActivity() {
 
                    postViewModel.like()
                 }
+                imagebutnRepost.setOnClickListener{
+                   postViewModel.repos()
+                }
+
             }
         }
 

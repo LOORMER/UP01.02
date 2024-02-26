@@ -8,6 +8,7 @@ class Post (
     var amountlike:Int,
     var amountrepost:Int,
     var isLike:Boolean,
+    var isRepos:Boolean
 )
 
 
