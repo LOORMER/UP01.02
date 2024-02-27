@@ -62,11 +62,7 @@
 ✅ Выбрать удобный избирательный участок для голосования и подать заявление до 11 марта 2024 года
 ✅ Узнайте о возможностях для избирателей на «Госуслугах»" />
 
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            app:srcCompat="@drawable/vzaputina" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
