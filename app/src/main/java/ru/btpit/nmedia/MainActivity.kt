@@ -4,19 +4,34 @@ import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.btpit.nmedia.databinding.ActivityMainBinding
+import ru.btpit.nmedia.databinding.PostCardBinding
 
 class MainActivity : AppCompatActivity() {
     var present_value_int = 0
-    private val postViewModel:PostViewModel by viewModels()
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        postViewModel.data.observe(this){post->
-            with(binding)
+
+        val viewModel:PostViewModel by viewModels()
+        viewModel.data.observe(this){post ->
+            post.map {post ->
+            PostCardBinding.inflate(layoutInflater, binding.container, false).apply {
+                textViewHeader.text = post.header
+                textViewContent.text = post.content
+                textViewDateTime.text = post.dataTime
+                textViewLike.text = toStringFromNumb(post.amountlike)
+                textViewRepost.text = toStringFromNumb(post.amountrepost)
+
+            }
+        }
+
+        /*    with(binding)
             {
                 textViewHeader.text = post.header
                 textViewContent.text = post.content
@@ -36,7 +51,8 @@ class MainActivity : AppCompatActivity() {
                    postViewModel.repos()
                 }
 
-            }
+
+         */   }
         }
 
         }
