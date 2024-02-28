@@ -17,45 +17,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         val viewModel:PostViewModel by viewModels()
-        viewModel.data.observe(this){post ->
-            post.map {post ->
-            PostCardBinding.inflate(layoutInflater, binding.container, false).apply {
-                textViewHeader.text = post.header
-                textViewContent.text = post.content
-                textViewDateTime.text = post.dataTime
-                textViewLike.text = toStringFromNumb(post.amountlike)
-                textViewRepost.text = toStringFromNumb(post.amountrepost)
+        val adapter = PostAdapter{
+            viewModel.likeById(it.id)
+        }
+        binding.list.adapter = adapter
+        viewModel.data.observe(this) {post ->
+            adapter.list = post
 
-            }
+
+          }
         }
 
-        /*    with(binding)
-            {
-                textViewHeader.text = post.header
-                textViewContent.text = post.content
-                textViewDateTime.text = post.dataTime
-                textViewLike.text = toStringFromNumb(post.amountlike)
-                textViewRepost.text = toStringFromNumb(post.amountrepost)
 
-                imagebutn.setBackgroundResource(
-                    if (post.isLike) R.drawable.redlikes
-                    else R.drawable.likes)
-
-                imagebutn.setOnClickListener {
-
-                   postViewModel.like()
-                }
-                imagebutnRepost.setOnClickListener{
-                   postViewModel.repos()
-                }
-
-
-         */   }
-        }
-
-        }
     }
 
     fun toStringFromNumb(count: Int): String
