@@ -17,8 +17,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val viewModel:PostViewModel by viewModels()
-        val adapter = PostAdapter{
+        val viewModel: PostViewModel by viewModels()
+
+        /* val adapter = PostAdapter{
             viewModel.likeById(it.id)
         }
         binding.list.adapter = adapter
@@ -30,18 +31,19 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-    }
-
-    fun toStringFromNumb(count: Int): String
-    {
-        return when(count){
-            in 0..<1_000 -> count.toString()
-            in 1000..<1_100-> "1K"
-            in 1_100..<10_000 -> ((count/100).toFloat()/10).toString() + "K"
-            in 10_000..<1_000_000 -> (count/1_000).toString() + "K"
-            in 1_000_000..<1_100_000 -> "1M"
-            in 1_100_000..<10_000_000 -> ((count/100_000).toFloat()/10).toString() + "M"
-            in 10_000_000..<1_000_000_000 -> (count/1_000_000).toString() + "M"
-            else -> "ꚙ"
+    }*/
+        fun toStringFromNumb(count: Int): String {
+            return when (count) {
+                in 0..<1_000 -> count.toString()
+                in 1000..<1_100 -> "1K"
+                in 1_100..<10_000 -> ((count / 100).toFloat() / 10).toString() + "K"
+                in 10_000..<1_000_000 -> (count / 1_000).toString() + "K"
+                in 1_000_000..<1_100_000 -> "1M"
+                in 1_100_000..<10_000_000 -> ((count / 100_000).toFloat() / 10).toString() + "M"
+                in 10_000_000..<1_000_000_000 -> (count / 1_000_000).toString() + "M"
+                else -> "ꚙ"
+            }
         }
+
     }
+}

@@ -7,8 +7,8 @@ interface PostRepository {
     fun get(): LiveData<List<Post>>
     fun likeById(id:Int)
     fun repos(id: Int)
+    fun removeById(id: Int)
 }
-
 class PostRepositoryInMemoryImpl : PostRepository {
     private var post = listOf(
         Post(
@@ -50,6 +50,10 @@ class PostRepositoryInMemoryImpl : PostRepository {
         }
         data.value = post
     }
+    override fun removeById(id: Int){
+        post = post.filter { it.id != id }
+        data.value = post
+    }
 
     override fun repos(id: Int) {
 
@@ -61,6 +65,8 @@ class PostRepositoryInMemoryImpl : PostRepository {
         }
         data.value = post
     }
+
+
 }
 
 
@@ -69,4 +75,5 @@ class PostViewModel : ViewModel() {
     val data = repository.get()
     fun likeById(id: Int) = repository.likeById(id)
     fun repos(id: Int) = repository.repos(id)
+    fun removeById(id: Int) = repository.removeById(id)
 }
