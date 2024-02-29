@@ -7,6 +7,7 @@ data class Post (
     val dataTime:String,
     var amountlike:Int,
     var amountrepost:Int,
+    val amountviews: Int,
     var isLike:Boolean,
     var isRepos:Boolean
 )

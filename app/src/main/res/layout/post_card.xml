@@ -63,7 +63,6 @@
         </LinearLayout>
 
         <ImageButton
-            android:id="@+id/imageViewmenu"
             android:layout_width="50dp"
             android:layout_height="30dp"
             android:layout_gravity="end"
@@ -71,7 +70,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:background="@drawable/tochki" />
+            android:background="@drawable/tochki"
+            android:id="@+id/imagebutntochki"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -131,7 +131,8 @@
             android:layout_width="40dp"
             android:layout_height="18dp"
             android:layout_marginLeft="4dp"
-            android:text="5">
+            android:text="5"
+            android:id="@+id/textViewSee">
         </TextView>
 
 
