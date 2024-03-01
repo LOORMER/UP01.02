@@ -2,84 +2,102 @@ package ru.btpit.nmedia
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.PopupMenu
+import android.widget.Toast
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.btpit.nmedia.databinding.PostCardBinding
-import android.view.View
 
-typealias OnLikeListner = (post : Post) -> Unit
-typealias OnRemoveListner = (post : Post) -> Unit
-
-class PostDiffCallback : DiffUtil.ItemCallback<Post>(){
-    override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
-        return  oldItem.id == newItem.id
-    }
-
+interface onInteractionListener {
+    fun onLike(post : Post) {}
+    fun onEdit(post : Post) {}
+    fun onRemove(post : Post) {}
+    fun onShare(post:Post) {}
+}
+class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
     override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
         return oldItem == newItem
     }
+
+    override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+        return oldItem.id == newItem.id
+    }
 }
+
 class PostViewHolder(
     private val binding: PostCardBinding,
+    private val onInteractionListener: onInteractionListener
 )  : RecyclerView.ViewHolder(binding.root) {
-    fun  bind(post: Post,listner: PostAdapter.Listner) {
-
+    fun bind(post: Post) {
         binding.apply {
             textViewHeader.text = post.header
             textViewContent.text = post.content
             textViewDateTime.text = post.dataTime
-            textViewLike.text = post.amountlike.toString()
-            textViewRepost.text = post.amountrepost.toString()
-            textViewSee.text = post.amountviews.toString()
-            imagebutnlike.setImageResource(
-                if (post.isLike) R.drawable.redlikes else R.drawable.likes
+            textViewLike.text = numberRangeSwitch(post.amountlike)
+            textViewRepost.text = numberRangeSwitch(post.amountrepost)
+            imagebutnlike.setBackgroundResource(
+                if (post.isLike)
+                    R.drawable.likes
+                else
+                    R.drawable.redlikes
             )
             imagebutnlike.setOnClickListener{
-                listner.onClickLike(post)
-            }
-            imagebutntochki.setOnClickListener{
-                listner.onClickMore(post,it,binding)
+                onInteractionListener.onLike(post)
             }
             imagebutnRepost.setOnClickListener{
-                listner.onClickShare(post)
+                onInteractionListener.onShare(post)
             }
+            imagebutntochki.setOnClickListener {
+                PopupMenu(it.context, it).apply {
+                    inflate(R.menu.post_menu)
+                    setOnMenuItemClickListener { item ->
+                        when (item.itemId) {
+                            R.id.remove -> {
+                                onInteractionListener.onRemove(post)
+                                true
+                            }
+                            R.id.edit -> {
+                                onInteractionListener.onEdit(post)
+                                true
+                            }
 
+                            else -> false
+                        }
+                    }
+                }.show()
+            }
         }
     }
-
 }
 
-class PostAdapter (private val listner: Listner): ListAdapter<Post, PostViewHolder>(PostDiffCallback()) {
+class PostsAdapter(
+    private val onInteractionListener: onInteractionListener
+) : ListAdapter<Post, PostViewHolder>(PostDiffCallback()) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = PostCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostViewHolder(binding)
+        return PostViewHolder(binding,
+            onInteractionListener
+        )
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = getItem(position)
-        holder.bind(post, listner)
+        holder.bind(post)
     }
+}
 
-    interface Listner {
-        fun onClickLike(post: Post)
-        fun onClickShare(post: Post)
-        fun onClickMore(post: Post, view: View, binding: PostCardBinding)
-        fun cancelEditPost(post: Post, binding: PostCardBinding)
-        fun saveEditPost(post: Post, binding: PostCardBinding)
-        fun editModeOn(binding: PostCardBinding, content: String)
-    }
-
-    private fun convertToString(count: Int): String {
-        return when (count) {
-            in 0..<1_000 -> count.toString()
-            in 1000..<1_100 -> "1K"
-            in 1_100..<10_000 -> ((count / 100).toFloat() / 10).toString() + "K"
-            in 10_000..<1_000_000 -> (count / 1_000).toString() + "K"
-            in 1_000_000..<1_100_000 -> "1M"
-            in 1_100_000..<10_000_000 -> ((count / 100_000).toFloat() / 10).toString() + "M"
-            in 10_000_000..<1_000_000_000 -> (count / 1_000_000).toString() + "M"
+private fun numberRangeSwitch(value: Int): String { // Switches display based on the size of the number
+    val v1: String = value.toString()
+    return if (value > 999)
+        when(value) {
+            in 1000..1099  -> v1[0].toString() + "K"
+            in 1100 .. 9999 -> v1[0].toString() + "." + v1[1].toString() + "K"
+            in 10000 .. 99999 -> v1[0].toString() + v1[1].toString() + "K"
+            in 100_000 .. 999_999 -> v1[0].toString() + v1[1].toString() + v1[2].toString() + "K"
+            in 1_000_000 .. 999_999_999 -> v1[0].toString() + "." + v1[1].toString() + "M"
             else -> "ꚙ"
-        }
-    }
+        } else value.toString()
 }

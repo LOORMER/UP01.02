@@ -1,79 +1,72 @@
 package ru.btpit.nmedia
 
-import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import android.os.Bundle
-import android.view.View
-import android.widget.PopupMenu
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.appcompat.app.AppCompatActivity
 import ru.btpit.nmedia.databinding.ActivityMainBinding
 import ru.btpit.nmedia.databinding.PostCardBinding
 
-class MainActivity : AppCompatActivity(),PostAdapter.Listner {
-     val viewModel: PostViewModel by viewModels()
-    @SuppressLint("MissingInflatedId")
+
+class MainActivity : AppCompatActivity() {
+    var present_value_int = 0
+
+    //@SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
+        val bind: PostCardBinding = PostCardBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val adapter = PostAdapter(this)
+
+        val viewModel: PostViewModel by viewModels()
+        val adapter = PostsAdapter(
+            object : onInteractionListener {
+                override fun onEdit(post: Post) {
+                    viewModel.edit(post)
+                }
+
+                override fun onLike(post: Post) {
+                    viewModel.likeById(post.id)
+                }
+
+                override fun onRemove(post: Post) {
+                    viewModel.removeById(post.id)
+                }
+
+                override fun onShare(post: Post) {
+                    viewModel.shareById(post.id)
+                }
+            })
         binding.list.adapter = adapter
-        viewModel.data.observe(this) { post ->
-            adapter.submitList(post)
-
-
+        viewModel.data.observe(this) { posts ->
+            adapter.submitList(posts)
         }
-
-        fun toStringFromNumb(count: Int): String {
-            return when (count) {
-                in 0..<1_000 -> count.toString()
-                in 1000..<1_100 -> "1K"
-                in 1_100..<10_000 -> ((count / 100).toFloat() / 10).toString() + "K"
-                in 10_000..<1_000_000 -> (count / 1_000).toString() + "K"
-                in 1_000_000..<1_100_000 -> "1M"
-                in 1_100_000..<10_000_000 -> ((count / 100_000).toFloat() / 10).toString() + "M"
-                in 10_000_000..<1_000_000_000 -> (count / 1_000_000).toString() + "M"
-                else -> "ꚙ"
+        binding.SAVE.setOnClickListener{
+            with(binding.editContent) {
+                if (text.isNullOrBlank()) {
+                    android.widget.Toast.makeText(
+                        this@MainActivity,
+                        "Content can't be empty",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+                viewModel.changeContent(text.toString())
+                viewModel.save()
+                setText("")
+                clearFocus()
+                AndroidUtils.hideKeyboard(this)
             }
         }
-    }
-
-
-    override fun onClickLike(post: Post) {
-        viewModel.likeById(post.id)
-
-    }
-
-    override fun onClickShare(post: Post) {
-        viewModel.ShareById(post.id)
-
-    }
-
-    override fun onClickMore(post: Post, view: View, binding: PostCardBinding) {
-        val popupMenu = PopupMenu(this,view)
-        popupMenu.inflate(R.menu.post_menu)
-        popupMenu.setOnMenuItemClickListener {
-            when(it.itemId)
-            {
-                R.id.remove -> viewModel.removeById(post.id)
-                //R.id.add -> viewModel.addPo
+        viewModel.edited.observe(this) { post ->
+            if (post.id == 0L) {
+                return@observe
             }
-            true
+            with (binding.editContent) {
+                requestFocus()
+                setText(post.content)
+            }
         }
-        popupMenu.show()
-
-    }
-
-    override fun cancelEditPost(post: Post, binding: PostCardBinding) {
-
-    }
-
-    override fun saveEditPost(post: Post, binding: PostCardBinding) {
-
-    }
-
-    override fun editModeOn(binding: PostCardBinding, content: String) {
-
     }
 }
